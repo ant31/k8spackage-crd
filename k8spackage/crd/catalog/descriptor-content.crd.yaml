@@ -1,0 +1,61 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: packagecontents.manifest.k8s.io
+  annotations:
+    displayName: Package Descriptor
+    description: Represents an Package/Application metadata that could be installed in the cluster
+spec:
+  group: manifest.k8s.io
+  version: v1alpha1
+  scope: Cluster
+  validation:
+    openAPIV3Schema:
+      type: object
+      description: Represents a single version of the operator software
+      required:
+      - digest
+      - size
+      - descriptorName
+      - source
+      properties:
+        descriptorName:
+          type: string
+          description: Descriptor resource name associated
+        size:
+          type: integer
+          description: content-size
+        digest:
+          type: string
+          description: Sha256 digest of the content
+        source:
+          type: object
+          description: Package content source
+          oneOf:
+          - type: object
+            required:
+              - blob
+            properties:
+              blob:
+                type: string
+                description: base64 of the tar.gz content
+          - type: object
+            required:
+              - urls
+            properties:
+              urls:
+                type: array
+                description: List of mirrors to download the package
+                items:
+                  type: string
+                  description: Download url
+        mediaType:
+          type: string
+          description: the package format
+          default: kubernetes
+
+  names:
+    plural: packagecontents
+    singular: packagecontent
+    kind: PackageContent
+    listKind: PackageContentList
